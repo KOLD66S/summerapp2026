@@ -1,63 +1,45 @@
 import React from 'react'
 import Sidebar from './components/Sidebar'
 import Topbar from './components/Topbar'
-import StatsGrid from './components/StatsGrid'
-import EngagementChart from './components/EngagementChart'
-import TopClubs from './components/TopClubs'
-import UpcomingEvents from './components/UpcomingEvents'
-import BudgetDonut from './components/BudgetDonut'
-import CollegeBars from './components/CollegeBars'
-import RecentActivity from './components/RecentActivity'
-import { Plus, Download } from 'lucide-react'
+import DashboardPage from './pages/DashboardPage'
+import ClubsPage from './pages/ClubsPage'
+import EventsPage from './pages/EventsPage'
+import ClubDetailPage from './pages/ClubDetailPage'
+import AnalyticsPage from './pages/AnalyticsPage'
+import RequestsPage from './pages/RequestsPage'
+import PlaceholderPage from './pages/PlaceholderPage'
+import { RouterProvider, useRouter, matchRoute } from './router'
+
+function RouteSwitch() {
+  const { path } = useRouter()
+  const route = matchRoute(path)
+
+  switch (route.name) {
+    case 'dashboard': return <DashboardPage />
+    case 'clubs': return <ClubsPage />
+    case 'events': return <EventsPage />
+    case 'club': return <ClubDetailPage id={route.params.id} />
+    case 'analytics': return <AnalyticsPage />
+    case 'requests': return <RequestsPage />
+    case 'budget': return <PlaceholderPage title="الميزانية" description="إدارة وتوزيع الميزانية على الأندية" />
+    case 'reports': return <PlaceholderPage title="التقارير" description="تقارير دورية وملخصات تنفيذية" />
+    case 'settings': return <PlaceholderPage title="الإعدادات" description="إعدادات المنصة والمستخدمين" />
+    default: return <DashboardPage />
+  }
+}
 
 export default function App() {
   return (
-    <div className="app">
-      <Sidebar />
-
-      <div className="main-area">
-        <Topbar />
-
-        <main className="content">
-          <div className="page-header fade-in">
-            <div>
-              <h1>أهلاً وسهلاً، د. خالد 👋</h1>
-              <p>إليك نظرة عامة على أداء الأندية الطلابية في جامعة القصيم</p>
-            </div>
-            <div style={{ display: 'flex', gap: 10 }}>
-              <button className="btn">
-                <Download size={15} />
-                تصدير التقرير
-              </button>
-              <button className="btn primary">
-                <Plus size={15} />
-                فعالية جديدة
-              </button>
-            </div>
-          </div>
-
-          <StatsGrid />
-
-          <div className="grid-2">
-            <EngagementChart />
-            <UpcomingEvents />
-          </div>
-
-          <div className="grid-2">
-            <TopClubs />
-            <BudgetDonut />
-          </div>
-
-          <div className="grid-2">
-            <CollegeBars />
-            <RecentActivity />
-          </div>
-
-          <footer style={{ textAlign: 'center', padding: '20px 0 0', color: 'var(--text-muted)', fontSize: 12 }}>
-            © 2026 عمادة شؤون الطلاب — جامعة القصيم • صُمم بـ ❤️ للأندية الطلابية
-          </footer>
-        </main>
+    <RouterProvider>
+      <div className="app">
+        <Sidebar />
+        <div className="main-area">
+          <Topbar />
+          <main className="content" key={window.location.hash}>
+            <RouteSwitch />
+          </main>
+        </div>
       </div>
-    </div>
+    </RouterProvider>
   )
 }
