@@ -54,10 +54,11 @@ export function matchRoute(path) {
     case '/clubs': return { name: 'clubs' }
     case '/events': return { name: 'events' }
     case '/analytics': return { name: 'analytics' }
-    case '/requests': return { name: 'requests' }
-    case '/budget': return { name: 'budget' }
+    case '/leaderboard': return { name: 'leaderboard' }
+    case '/supervisors': return { name: 'supervisors' }
     case '/reports': return { name: 'reports' }
     case '/settings': return { name: 'settings' }
+    case '/help': return { name: 'help' }
     default: return { name: 'dashboard' }
   }
 }

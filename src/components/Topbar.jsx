@@ -1,14 +1,15 @@
 import React, { useState, useEffect } from 'react'
-import { Search, Bell, MessageCircle, Moon, ChevronLeft } from 'lucide-react'
+import { Search, Bell, MessageCircle, Sun, ChevronLeft } from 'lucide-react'
 import { useRouter, matchRoute } from '../router'
+import { programName } from '../thamar'
 
 const titles = {
-  dashboard: 'الرئيسية',
+  dashboard: 'لوحة التحكم',
   clubs: 'الأندية',
-  events: 'الفعاليات',
+  events: 'الأنشطة',
   analytics: 'التحليلات',
-  requests: 'طلبات الاعتماد',
-  budget: 'الميزانية',
+  leaderboard: 'لوحة المتميزين',
+  supervisors: 'المشرفون',
   reports: 'التقارير',
   settings: 'الإعدادات',
   club: 'تفاصيل النادي',
@@ -30,13 +31,13 @@ export default function Topbar() {
   return (
     <header className="topbar">
       <div className="breadcrumb">
-        <span>منصة الأندية</span>
+        <span>{programName}</span>
         <ChevronLeft size={14} />
-        <strong>{titles[route.name] || 'الرئيسية'}</strong>
+        <strong>{titles[route.name] || 'لوحة التحكم'}</strong>
       </div>
 
       <div className="search">
-        <input placeholder="ابحث عن نادٍ، فعالية، أو طالب..." />
+        <input placeholder="ابحث عن نشاط، نادٍ، أو طالب..." />
         <Search size={17} className="search-icon" />
         <kbd className="search-kbd">⌘K</kbd>
       </div>
@@ -48,8 +49,8 @@ export default function Topbar() {
       <button className="icon-btn" title="الرسائل">
         <MessageCircle size={18} />
       </button>
-      <button className="icon-btn" title="الوضع الليلي">
-        <Moon size={18} />
+      <button className="icon-btn" title="الوضع النهاري">
+        <Sun size={18} />
       </button>
 
       <div className="live-time">

@@ -1,18 +1,19 @@
 import React from 'react'
 import {
   LayoutDashboard, Users, CalendarDays, BarChart3,
-  MessageSquare, Wallet, FileBarChart, Settings,
-  HelpCircle, LogOut, Sparkles
+  Trophy, UserCheck, FileBarChart, Settings,
+  HelpCircle, LogOut, Sparkles, Camera
 } from 'lucide-react'
 import { useRouter, Link, matchRoute } from '../router'
+import { summary, programName, supervisor } from '../thamar'
 
 const mainNav = [
   { icon: LayoutDashboard, label: 'لوحة التحكم', to: '/', name: 'dashboard' },
-  { icon: Users, label: 'الأندية', to: '/clubs', name: 'clubs', badge: '24' },
-  { icon: CalendarDays, label: 'الفعاليات', to: '/events', name: 'events', badge: '8' },
+  { icon: Users, label: 'الأندية', to: '/clubs', name: 'clubs', badge: String(summary.totalClubs), badgeStyle: 'thamar' },
+  { icon: CalendarDays, label: 'الأنشطة', to: '/events', name: 'events', badge: String(summary.totalActivities) },
   { icon: BarChart3, label: 'التحليلات', to: '/analytics', name: 'analytics' },
-  { icon: MessageSquare, label: 'طلبات الاعتماد', to: '/requests', name: 'requests', badge: '5', badgeStyle: 'gold' },
-  { icon: Wallet, label: 'الميزانية', to: '/budget', name: 'budget' },
+  { icon: Trophy, label: 'لوحة المتميزين', to: '/leaderboard', name: 'leaderboard', badgeStyle: 'gold', badge: '★' },
+  { icon: UserCheck, label: 'المشرفون', to: '/supervisors', name: 'supervisors' },
   { icon: FileBarChart, label: 'التقارير', to: '/reports', name: 'reports' },
 ]
 
@@ -28,10 +29,10 @@ export default function Sidebar() {
   return (
     <aside className="sidebar">
       <div className="brand">
-        <div className="brand-logo">QU</div>
+        <div className="brand-logo">{programName.charAt(0)}</div>
         <div className="brand-text">
-          <h1>أندية القصيم</h1>
-          <span>منصة عمادة شؤون الطلاب</span>
+          <h1>{programName}</h1>
+          <span>الأندية الطلابية</span>
         </div>
         <div className="live-pulse">
           <span className="live-pulse-dot" />
@@ -71,12 +72,12 @@ export default function Sidebar() {
 
       <div className="sidebar-footer">
         <div className="user-card">
-          <div className="avatar">خ</div>
+          <div className="avatar">{supervisor.initial}</div>
           <div className="user-card-info">
-            <h4>د. خالد العتيبي</h4>
-            <span>عميد شؤون الطلاب</span>
+            <h4>{supervisor.name}</h4>
+            <span>{supervisor.title}</span>
           </div>
-          <Sparkles size={16} color="var(--gold)" style={{ marginRight: 'auto', filter: 'drop-shadow(0 0 8px var(--gold))' }} />
+          <Sparkles size={16} color="#d97706" style={{ marginRight: 'auto', filter: 'drop-shadow(0 0 6px rgba(217,119,6,0.5))' }} />
         </div>
       </div>
     </aside>

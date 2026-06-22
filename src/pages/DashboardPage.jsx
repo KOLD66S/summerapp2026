@@ -1,14 +1,17 @@
 import React, { useEffect, useState } from 'react'
 import {
-  Users, CalendarDays, Trophy, TrendingUp, ArrowUpRight, ArrowDownRight,
-  Plus, Download, Sparkles, MapPin, Clock, Crown,
-  UserPlus, CheckCircle2, FileText, Award, Calendar, ChevronLeft
+  Users, CalendarDays, Trophy, Award, Sparkles, Download, Plus,
+  MapPin, Clock, Crown, UserCheck, Camera, Activity, TrendingUp,
+  ChevronLeft, Target
 } from 'lucide-react'
 import {
   ResponsiveContainer, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip,
-  PieChart, Pie, Cell, BarChart, Bar, LineChart, Line, RadialBarChart, RadialBar
+  PieChart, Pie, Cell, BarChart, Bar, RadialBarChart, RadialBar
 } from 'recharts'
-import { clubs, events, engagementData, collegeData, budgetData, activityItems } from '../data'
+import {
+  summary, clubs, activities, activityTypes, monthlyTrend, modes,
+  topSupervisors, supervisor, programName, programTagline, colorForType
+} from '../thamar'
 import { Link } from '../router'
 
 function useCounter(target, duration = 1400) {
@@ -27,7 +30,7 @@ function useCounter(target, duration = 1400) {
   return val
 }
 
-function StatCard({ icon: Icon, label, value, trend, up, color, bg, glow, suffix, delay }) {
+function StatCard({ icon: Icon, label, value, trend, up = true, color, bg, glow, suffix, delay }) {
   const num = useCounter(value)
   return (
     <div
@@ -36,10 +39,11 @@ function StatCard({ icon: Icon, label, value, trend, up, color, bg, glow, suffix
     >
       <div className="stat-head">
         <div className="stat-icon"><Icon size={20} strokeWidth={2.3} /></div>
-        <div className={`stat-trend ${up ? '' : 'down'}`}>
-          {up ? <ArrowUpRight size={12} /> : <ArrowDownRight size={12} />}
-          {trend}
-        </div>
+        {trend && (
+          <div className={`stat-trend ${up ? '' : 'down'}`}>
+            <TrendingUp size={12} /> {trend}
+          </div>
+        )}
       </div>
       <div className="stat-value">{num.toLocaleString('ar-EG')}{suffix || ''}</div>
       <div className="stat-label">{label}</div>
@@ -53,98 +57,113 @@ export default function DashboardPage() {
       <div className="hero fade-in">
         <div style={{ position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 20, flexWrap: 'wrap' }}>
           <div>
-            <div className="chip gold" style={{ marginBottom: 10 }}>
-              <Sparkles size={12} /> منصة عمادة شؤون الطلاب - جامعة القصيم
+            <div style={{ display: 'flex', gap: 6, marginBottom: 12, flexWrap: 'wrap' }}>
+              <span className="chip success">
+                <Sparkles size={12} /> منصة {programName}
+              </span>
+              <span className="chip violet">
+                إشراف {supervisor.name}
+              </span>
             </div>
-            <h1 style={{
-              fontSize: 32, fontWeight: 900, letterSpacing: -0.6, lineHeight: 1.2,
-              background: 'linear-gradient(135deg, #fff 0%, #c7d2fe 100%)',
-              WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text'
-            }}>
-              أهلاً وسهلاً، د. خالد 👋
+            <h1 style={{ fontSize: 34, fontWeight: 900, letterSpacing: -0.8, lineHeight: 1.2, color: 'var(--text-primary)' }}>
+              أهلاً وسهلاً، <span className="text-gradient">{supervisor.name}</span>
             </h1>
-            <p style={{ color: 'var(--text-secondary)', fontSize: 14, marginTop: 8, maxWidth: 600 }}>
-              نظرة شاملة على أداء الأندية الطلابية، الفعاليات، والمؤشرات الحيوية لحظياً
+            <p style={{ color: 'var(--text-secondary)', fontSize: 14.5, marginTop: 8, maxWidth: 620 }}>
+              نظرة شاملة على أداء الأندية والأنشطة الطلابية في {programName} — البيانات المعروضة لحظية ومستندة على سجلات المنصة.
             </p>
           </div>
           <div style={{ display: 'flex', gap: 10 }}>
-            <button className="btn">
-              <Download size={15} /> تصدير
-            </button>
-            <button className="btn primary">
-              <Plus size={15} /> فعالية جديدة
-            </button>
+            <button className="btn"><Download size={15} /> تصدير</button>
+            <button className="btn primary"><Plus size={15} /> نشاط جديد</button>
           </div>
         </div>
       </div>
 
       <div className="stats-grid">
-        <StatCard delay={1} icon={Users} label="إجمالي الأعضاء" value={4328} trend="+12.4%" up
-          color="var(--accent)" bg="var(--accent-soft)" glow="rgba(99,102,241,0.25)" />
-        <StatCard delay={2} icon={Trophy} label="الأندية النشطة" value={24} trend="+3 نوادٍ" up
-          color="var(--gold)" bg="var(--gold-soft)" glow="rgba(251,191,36,0.25)" />
-        <StatCard delay={3} icon={CalendarDays} label="فعاليات الشهر" value={37} trend="+8.2%" up
-          color="var(--cyan)" bg="var(--cyan-soft)" glow="rgba(6,182,212,0.25)" />
-        <StatCard delay={4} icon={TrendingUp} label="معدل المشاركة" value={86} suffix="%" trend="-2.1%" up={false}
-          color="var(--violet)" bg="var(--violet-soft)" glow="rgba(168,85,247,0.25)" />
+        <StatCard delay={1} icon={Activity} label="إجمالي الأنشطة" value={summary.totalActivities}
+          color="var(--accent)" bg="var(--accent-soft)" glow="rgba(79,70,229,0.18)" trend="+22%" />
+        <StatCard delay={2} icon={Users} label="الأندية النشطة" value={summary.totalClubs}
+          color="var(--emerald)" bg="var(--emerald-soft)" glow="rgba(5,150,105,0.18)" trend="نشط" />
+        <StatCard delay={3} icon={UserCheck} label="مشاركات الطلاب" value={summary.totalParticipants}
+          color="var(--cyan)" bg="var(--cyan-soft)" glow="rgba(8,145,178,0.18)" trend="+18%" />
+        <StatCard delay={4} icon={Award} label="مجموع النقاط" value={summary.totalPoints}
+          color="var(--violet)" bg="var(--violet-soft)" glow="rgba(124,58,237,0.18)" trend="إنجاز" />
+      </div>
+
+      <div className="kpi-grid fade-in d-5">
+        <div className="kpi-mini">
+          <div className="kpi-mini-label"><Users size={11} style={{ verticalAlign: 'middle' }} /> طلاب فريدون</div>
+          <div className="kpi-mini-value">{summary.uniqueStudents.toLocaleString('ar-EG')}</div>
+          <div className="kpi-mini-sub">طالب وطالبة مشاركون فعلياً</div>
+        </div>
+        <div className="kpi-mini">
+          <div className="kpi-mini-label"><UserCheck size={11} style={{ verticalAlign: 'middle' }} /> المشرفون</div>
+          <div className="kpi-mini-value">{summary.totalSupervisors}</div>
+          <div className="kpi-mini-sub">عضو هيئة تدريس مشرف</div>
+        </div>
+        <div className="kpi-mini">
+          <div className="kpi-mini-label"><Camera size={11} style={{ verticalAlign: 'middle' }} /> صور موثقة</div>
+          <div className="kpi-mini-value">{summary.totalPhotos.toLocaleString('ar-EG')}</div>
+          <div className="kpi-mini-sub">من الأنشطة والفعاليات</div>
+        </div>
       </div>
 
       <div className="grid-2">
-        <EngagementChart />
-        <UpcomingEvents />
+        <ActivityTrend />
+        <TopClubsCard />
       </div>
 
       <div className="grid-2">
-        <TopClubs />
-        <BudgetDonut />
+        <RecentEventsCard />
+        <ActivityTypesDonut />
       </div>
 
       <div className="grid-2">
-        <CollegeBars />
-        <RecentActivity />
+        <ModeBars />
+        <TopSupervisorsCard />
       </div>
 
       <SatisfactionStrip />
 
       <footer style={{ textAlign: 'center', padding: '20px 0', color: 'var(--text-muted)', fontSize: 12 }}>
-        © 2026 عمادة شؤون الطلاب — جامعة القصيم • تم البناء بتقنيات سحابية متقدمة
+        © 2026 {programName} • {supervisor.name} • جامعة القصيم
       </footer>
     </>
   )
 }
 
-function EngagementChart() {
+function ActivityTrend() {
   return (
-    <div className="card fade-in d-2">
+    <div className="card fade-in d-3">
       <div className="card-head">
         <div>
-          <h3>تطور المشاركة الطلابية</h3>
-          <p>الأعضاء والفعاليات خلال آخر 8 أشهر</p>
+          <h3>تطور الأنشطة عبر الأشهر</h3>
+          <p>نمو عدد الأنشطة والمشاركات الشهرية</p>
         </div>
         <div style={{ display: 'flex', gap: 6 }}>
-          <span className="chip info"><span style={{ width: 7, height: 7, borderRadius: '50%', background: 'var(--accent)' }} /> الأعضاء</span>
-          <span className="chip violet"><span style={{ width: 7, height: 7, borderRadius: '50%', background: 'var(--violet)' }} /> الفعاليات</span>
+          <span className="chip info"><span style={{ width: 7, height: 7, borderRadius: '50%', background: 'var(--accent)' }} /> أنشطة</span>
+          <span className="chip violet"><span style={{ width: 7, height: 7, borderRadius: '50%', background: 'var(--violet)' }} /> مشاركات</span>
         </div>
       </div>
       <div style={{ width: '100%', height: 280 }}>
         <ResponsiveContainer>
-          <AreaChart data={engagementData} margin={{ top: 10, right: 0, left: 0, bottom: 0 }}>
+          <AreaChart data={monthlyTrend} margin={{ top: 10, right: 8, left: 0, bottom: 0 }}>
             <defs>
-              <linearGradient id="colorMembers" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor="#6366f1" stopOpacity={0.5} />
-                <stop offset="100%" stopColor="#6366f1" stopOpacity={0} />
+              <linearGradient id="actGrad" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stopColor="#4f46e5" stopOpacity={0.42} />
+                <stop offset="100%" stopColor="#4f46e5" stopOpacity={0} />
               </linearGradient>
-              <linearGradient id="colorEvents" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor="#a855f7" stopOpacity={0.45} />
-                <stop offset="100%" stopColor="#a855f7" stopOpacity={0} />
+              <linearGradient id="parGrad" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stopColor="#7c3aed" stopOpacity={0.4} />
+                <stop offset="100%" stopColor="#7c3aed" stopOpacity={0} />
               </linearGradient>
             </defs>
-            <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.04)" />
-            <XAxis dataKey="month" stroke="#6b7494" tick={{ fontSize: 11 }} />
-            <YAxis stroke="#6b7494" tick={{ fontSize: 11 }} />
-            <Tooltip cursor={{ stroke: 'rgba(99,102,241,0.25)', strokeWidth: 1 }} />
-            <Area type="monotone" dataKey="members" stroke="#6366f1" strokeWidth={2.5} fill="url(#colorMembers)" name="الأعضاء" />
-            <Area type="monotone" dataKey="events" stroke="#a855f7" strokeWidth={2.5} fill="url(#colorEvents)" name="الفعاليات" />
+            <CartesianGrid strokeDasharray="3 3" stroke="rgba(15,23,42,0.05)" />
+            <XAxis dataKey="short" stroke="#64748b" tick={{ fontSize: 11 }} />
+            <YAxis stroke="#64748b" tick={{ fontSize: 11 }} />
+            <Tooltip />
+            <Area type="monotone" dataKey="activities" stroke="#4f46e5" strokeWidth={2.5} fill="url(#actGrad)" name="أنشطة" />
+            <Area type="monotone" dataKey="participants" stroke="#7c3aed" strokeWidth={2.5} fill="url(#parGrad)" name="مشاركات" />
           </AreaChart>
         </ResponsiveContainer>
       </div>
@@ -152,47 +171,14 @@ function EngagementChart() {
   )
 }
 
-function UpcomingEvents() {
-  const upcoming = events.slice(0, 4)
-  return (
-    <div className="card fade-in d-3">
-      <div className="card-head">
-        <div>
-          <h3>الفعاليات القادمة</h3>
-          <p>{events.length} فعاليات مجدولة</p>
-        </div>
-        <Link to="/events" className="chip">عرض الكل <ChevronLeft size={12} /></Link>
-      </div>
-      <div>
-        {upcoming.map((e) => (
-          <div key={e.id} className="event-item">
-            <div className="event-date">
-              <strong>{e.day}</strong>
-              <span>{e.month}</span>
-            </div>
-            <div className="event-body">
-              <h4>{e.title}</h4>
-              <div className="event-meta">
-                <span><MapPin size={11} /> {e.location}</span>
-                <span><Clock size={11} /> {e.time}</span>
-                <span className={`chip ${e.tag}`} style={{ padding: '2px 8px', fontSize: 10.5 }}>{e.status}</span>
-              </div>
-            </div>
-          </div>
-        ))}
-      </div>
-    </div>
-  )
-}
-
-function TopClubs() {
+function TopClubsCard() {
   const top = clubs.slice(0, 5)
   return (
     <div className="card fade-in d-4">
       <div className="card-head">
         <div>
           <h3>الأندية الأكثر نشاطاً</h3>
-          <p>ترتيب الأندية حسب الأداء هذا الفصل</p>
+          <p>ترتيب الأندية حسب عدد الأنشطة</p>
         </div>
         <Link to="/clubs" className="chip">عرض الكل <ChevronLeft size={12} /></Link>
       </div>
@@ -201,29 +187,33 @@ function TopClubs() {
           <Link to={`/club/${c.id}`} key={c.id} className="club-row">
             <div
               className="club-logo"
-              style={{ background: `linear-gradient(135deg, ${c.color}30, ${c.color}10)`, border: `1px solid ${c.color}50`, boxShadow: `0 0 16px ${c.color}30` }}
+              style={{
+                background: `linear-gradient(135deg, ${c.color}25, ${c.color}10)`,
+                border: `1px solid ${c.color}50`,
+                boxShadow: `0 4px 16px ${c.color}25`
+              }}
             >
               {c.logo}
             </div>
             <div className="club-info">
               <h4>
-                {i === 0 && <Crown size={13} color="var(--gold)" style={{ verticalAlign: 'middle', marginLeft: 4 }} />}
+                {i === 0 && <Crown size={13} color="#d97706" style={{ verticalAlign: 'middle', marginLeft: 4 }} />}
                 {c.name}
               </h4>
-              <span>{c.college}</span>
+              <span>{c.supervisor}</span>
             </div>
             <div className="club-meta">
               <div className="meta-item">
+                <strong>{c.activities}</strong>
+                <span>نشاط</span>
+              </div>
+              <div className="meta-item">
                 <strong>{c.members}</strong>
-                <span>عضو</span>
+                <span>مشاركة</span>
               </div>
               <div className="meta-item">
-                <strong>{c.events}</strong>
-                <span>فعالية</span>
-              </div>
-              <div className="meta-item">
-                <strong style={{ color: 'var(--gold)' }}>{c.rating}</strong>
-                <span>تقييم</span>
+                <strong style={{ color: 'var(--gold)' }}>{c.points}</strong>
+                <span>نقطة</span>
               </div>
             </div>
           </Link>
@@ -233,51 +223,35 @@ function TopClubs() {
   )
 }
 
-function BudgetDonut() {
-  const total = budgetData.reduce((s, d) => s + d.value, 0)
+function RecentEventsCard() {
+  const recent = activities.slice(0, 5)
   return (
     <div className="card fade-in d-5">
       <div className="card-head">
         <div>
-          <h3>توزيع الميزانية</h3>
-          <p>الفصل الدراسي الحالي</p>
+          <h3>آخر الأنشطة المنفذة</h3>
+          <p>الأنشطة الأحدث في المنصة</p>
         </div>
-        <span className="chip success">540K SAR</span>
+        <Link to="/events" className="chip">عرض الكل <ChevronLeft size={12} /></Link>
       </div>
-      <div style={{ position: 'relative', width: '100%', height: 200 }}>
-        <ResponsiveContainer>
-          <PieChart>
-            <Pie
-              data={budgetData}
-              innerRadius={62}
-              outerRadius={88}
-              paddingAngle={3}
-              dataKey="value"
-              startAngle={90}
-              endAngle={450}
-            >
-              {budgetData.map((entry, i) => (
-                <Cell key={i} fill={entry.color} stroke="none" />
-              ))}
-            </Pie>
-            <Tooltip />
-          </PieChart>
-        </ResponsiveContainer>
-        <div style={{
-          position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column',
-          alignItems: 'center', justifyContent: 'center', pointerEvents: 'none'
-        }}>
-          <span style={{ fontSize: 11, color: 'var(--text-muted)', fontWeight: 700, letterSpacing: 1 }}>الإجمالي</span>
-          <strong style={{ fontSize: 22, fontWeight: 900 }}>{total}%</strong>
-          <span style={{ fontSize: 10, color: 'var(--text-muted)' }}>موزّع</span>
-        </div>
-      </div>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginTop: 14 }}>
-        {budgetData.map((d, i) => (
-          <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-            <span style={{ width: 10, height: 10, borderRadius: '50%', background: d.color, flexShrink: 0, boxShadow: `0 0 10px ${d.color}` }} />
-            <span style={{ fontSize: 13, color: 'var(--text-secondary)', flex: 1, fontWeight: 600 }}>{d.name}</span>
-            <strong style={{ fontSize: 13, fontWeight: 900 }}>{d.value}%</strong>
+      <div>
+        {recent.map((a) => (
+          <div key={a.activityId} className="event-item">
+            <div className="event-date">
+              <strong>{a.day}</strong>
+              <span>{a.month.slice(0, 3)}</span>
+            </div>
+            <div className="event-body">
+              <h4>{a.title}</h4>
+              <div className="event-meta">
+                <span><MapPin size={11} /> {a.location || 'غير محدد'}</span>
+                <span><Clock size={11} /> {a.time}</span>
+                <span><Users size={11} /> {a.participantCount}</span>
+                <span className="chip" style={{ padding: '2px 8px', fontSize: 10.5, color: colorForType(a.type), borderColor: colorForType(a.type) + '40', background: colorForType(a.type) + '12' }}>
+                  {a.clubName}
+                </span>
+              </div>
+            </div>
           </div>
         ))}
       </div>
@@ -285,30 +259,71 @@ function BudgetDonut() {
   )
 }
 
-function CollegeBars() {
+function ActivityTypesDonut() {
+  const top = activityTypes.slice(0, 6)
   return (
     <div className="card fade-in d-6">
       <div className="card-head">
         <div>
-          <h3>مشاركة الكليات</h3>
-          <p>عدد الأعضاء حسب الكلية</p>
+          <h3>أنواع الأنشطة</h3>
+          <p>توزيع الأنشطة حسب النوع</p>
         </div>
-        <span className="chip success">+18% هذا الفصل</span>
       </div>
-      <div style={{ width: '100%', height: 240 }}>
+      <div style={{ position: 'relative', width: '100%', height: 220 }}>
         <ResponsiveContainer>
-          <BarChart data={collegeData} margin={{ top: 10, right: 0, left: 0, bottom: 0 }}>
+          <PieChart>
+            <Pie data={top} innerRadius={62} outerRadius={92} paddingAngle={3} dataKey="value" startAngle={90} endAngle={450}>
+              {top.map((entry) => (
+                <Cell key={entry.name} fill={colorForType(entry.name)} stroke="none" />
+              ))}
+            </Pie>
+            <Tooltip />
+          </PieChart>
+        </ResponsiveContainer>
+        <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', pointerEvents: 'none' }}>
+          <span style={{ fontSize: 11, color: 'var(--text-muted)', fontWeight: 700, letterSpacing: 1 }}>الأنواع</span>
+          <strong style={{ fontSize: 24, fontWeight: 900 }}>{summary.uniqueTypes}</strong>
+          <span style={{ fontSize: 10, color: 'var(--text-muted)' }}>متنوعة</span>
+        </div>
+      </div>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginTop: 14 }}>
+        {top.slice(0, 4).map((d) => (
+          <div key={d.name} style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            <span style={{ width: 10, height: 10, borderRadius: '50%', background: colorForType(d.name), flexShrink: 0, boxShadow: `0 0 8px ${colorForType(d.name)}55` }} />
+            <span style={{ fontSize: 12.5, color: 'var(--text-secondary)', flex: 1, fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{d.name}</span>
+            <strong style={{ fontSize: 13, fontWeight: 900 }}>{d.value}</strong>
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+function ModeBars() {
+  const data = modes.map(m => ({ ...m, color: m.name === 'حضوري' ? '#059669' : '#7c3aed' }))
+  return (
+    <div className="card fade-in d-7">
+      <div className="card-head">
+        <div>
+          <h3>نمط تنفيذ الأنشطة</h3>
+          <p>التوزيع بين الحضوري والافتراضي</p>
+        </div>
+        <span className="chip success">{Math.round((modes.find(m => m.name === 'حضوري')?.value || 0) / summary.totalActivities * 100)}% حضوري</span>
+      </div>
+      <div style={{ width: '100%', height: 220 }}>
+        <ResponsiveContainer>
+          <BarChart data={data} margin={{ top: 10, right: 0, left: 0, bottom: 0 }} layout="vertical">
             <defs>
-              <linearGradient id="barGrad" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor="#6366f1" />
-                <stop offset="100%" stopColor="#a855f7" />
+              <linearGradient id="modeBar" x1="0" y1="0" x2="1" y2="0">
+                <stop offset="0%" stopColor="#059669" />
+                <stop offset="100%" stopColor="#0891b2" />
               </linearGradient>
             </defs>
-            <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.04)" vertical={false} />
-            <XAxis dataKey="college" stroke="#6b7494" tick={{ fontSize: 11 }} />
-            <YAxis stroke="#6b7494" tick={{ fontSize: 11 }} />
-            <Tooltip cursor={{ fill: 'rgba(99,102,241,0.06)' }} />
-            <Bar dataKey="members" fill="url(#barGrad)" radius={[8, 8, 0, 0]} name="الأعضاء" />
+            <CartesianGrid strokeDasharray="3 3" stroke="rgba(15,23,42,0.05)" horizontal={false} />
+            <XAxis type="number" stroke="#64748b" tick={{ fontSize: 11 }} />
+            <YAxis type="category" dataKey="name" stroke="#64748b" tick={{ fontSize: 12, fontWeight: 700 }} width={80} />
+            <Tooltip />
+            <Bar dataKey="value" fill="url(#modeBar)" radius={[0, 8, 8, 0]} name="الأنشطة" />
           </BarChart>
         </ResponsiveContainer>
       </div>
@@ -316,65 +331,67 @@ function CollegeBars() {
   )
 }
 
-function RecentActivity() {
-  const iconMap = { join: UserPlus, approve: CheckCircle2, award: Award, request: FileText, schedule: Calendar }
+function TopSupervisorsCard() {
+  const top = topSupervisors.slice(0, 5)
   return (
-    <div className="card fade-in d-7">
+    <div className="card fade-in d-8">
       <div className="card-head">
         <div>
-          <h3>آخر النشاطات</h3>
-          <p>تحديثات لحظية من جميع الأندية</p>
+          <h3>المشرفون المتميزون</h3>
+          <p>الأكثر إشرافاً على الأنشطة</p>
         </div>
-        <span className="chip success">
-          <span style={{ width: 6, height: 6, borderRadius: '50%', background: 'var(--emerald)', boxShadow: '0 0 10px var(--emerald)' }} />
-          مباشر
-        </span>
+        <Link to="/supervisors" className="chip">الكل <ChevronLeft size={12} /></Link>
       </div>
       <div>
-        {activityItems.map((it, i) => {
-          const Icon = iconMap[it.type]
-          return (
-            <div key={i} className="activity-item">
-              <div className="activity-dot" style={{ background: it.bg, color: it.color, boxShadow: `0 0 16px ${it.color}55` }}>
-                <Icon size={15} strokeWidth={2.4} />
-              </div>
-              <div className="activity-body">
-                <p>{it.text} <strong>{it.bold}</strong>{it.text2 || ''}</p>
-                <span>{it.time}</span>
-              </div>
+        {top.map((s, i) => (
+          <div key={s.name} className="activity-item">
+            <div className="activity-dot" style={{
+              background: i === 0 ? 'var(--gold-soft)' : 'var(--accent-soft)',
+              color: i === 0 ? 'var(--gold)' : 'var(--accent)',
+              borderColor: i === 0 ? 'var(--gold)' : 'var(--accent)'
+            }}>
+              <UserCheck size={16} strokeWidth={2.3} />
             </div>
-          )
-        })}
+            <div className="activity-body" style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <div style={{ flex: 1 }}>
+                <p><strong>{s.name}</strong></p>
+                <span>{s.activities} نشاط • {s.clubCount} ناد{s.clubCount > 1 ? '/أندية' : ''}</span>
+              </div>
+              <span className="chip gold" style={{ fontSize: 11 }}>{s.points} نقطة</span>
+            </div>
+          </div>
+        ))}
       </div>
     </div>
   )
 }
 
 function SatisfactionStrip() {
-  const data = [{ name: 'رضا', value: 93, fill: '#10b981' }]
+  const participationRate = Math.round((summary.totalParticipants / (summary.uniqueStudents * 2)) * 100)
+  const data = [{ name: 'مشاركة', value: Math.min(participationRate, 95), fill: '#059669' }]
   return (
-    <div className="card fade-in d-8" style={{ background: 'linear-gradient(120deg, rgba(16,185,129,0.1), rgba(6,182,212,0.05))' }}>
+    <div className="card fade-in d-8" style={{ background: 'linear-gradient(120deg, rgba(5,150,105,0.06), rgba(8,145,178,0.04))' }}>
       <div style={{ display: 'grid', gridTemplateColumns: '160px 1fr', gap: 24, alignItems: 'center' }}>
         <div style={{ width: 160, height: 160, position: 'relative' }}>
           <ResponsiveContainer>
             <RadialBarChart innerRadius="70%" outerRadius="100%" data={data} startAngle={90} endAngle={-270}>
-              <RadialBar background dataKey="value" cornerRadius={20} fill="#10b981" />
+              <RadialBar background={{ fill: 'rgba(5,150,105,0.10)' }} dataKey="value" cornerRadius={20} fill="#059669" />
             </RadialBarChart>
           </ResponsiveContainer>
-          <div style={{ position: 'absolute', inset: 0, display: 'grid', placeItems: 'center', flexDirection: 'column', textAlign: 'center' }}>
-            <strong style={{ fontSize: 32, fontWeight: 900, color: 'var(--emerald)' }}>93%</strong>
+          <div style={{ position: 'absolute', inset: 0, display: 'grid', placeItems: 'center', textAlign: 'center' }}>
+            <strong style={{ fontSize: 30, fontWeight: 900, color: 'var(--emerald)' }}>{participationRate}%</strong>
           </div>
         </div>
         <div>
           <div className="chip success" style={{ marginBottom: 10 }}>
-            <Sparkles size={12} /> أعلى مستوى رضا في تاريخ المنصة
+            <Sparkles size={12} /> {programName} يحقق نتائج استثنائية
           </div>
-          <h2 style={{ fontSize: 22, fontWeight: 900, letterSpacing: -0.3, marginBottom: 6 }}>
-            رضا الطلاب عن الأنشطة وصل لـ 93% هذا الفصل
+          <h2 style={{ fontSize: 24, fontWeight: 900, letterSpacing: -0.3, marginBottom: 8 }}>
+            معدل مشاركة الطلاب عبر {summary.totalClubs} أندية وصل لمستوى ممتاز
           </h2>
           <p style={{ color: 'var(--text-secondary)', fontSize: 13.5, lineHeight: 1.7 }}>
-            بناءً على استبيان شامل لأكثر من 2,800 طالب وطالبة. زيادة بنسبة 6 نقاط مئوية مقارنة بالفصل السابق،
-            مع تحسن ملحوظ في جودة الفعاليات والتجهيزات.
+            بلغ إجمالي مشاركات الطلاب {summary.totalParticipants.toLocaleString('ar-EG')} مشاركة من {summary.uniqueStudents.toLocaleString('ar-EG')} طالب وطالبة فريد،
+            بإشراف {summary.totalSupervisors} عضواً من هيئة التدريس و{summary.totalPhotos.toLocaleString('ar-EG')} صورة موثقة.
           </p>
         </div>
       </div>

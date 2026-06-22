@@ -35,3 +35,11 @@ pnpm-debug.log*
 
 # Vite cache
 .vite/
+
+# Source data files (raw)
+ثمر*.xlsx
+parse-thamar.cjs
+transform-thamar.cjs
+thamar-raw.json
+thamar-preview.txt
+transform-out.txt

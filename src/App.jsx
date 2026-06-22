@@ -6,7 +6,8 @@ import ClubsPage from './pages/ClubsPage'
 import EventsPage from './pages/EventsPage'
 import ClubDetailPage from './pages/ClubDetailPage'
 import AnalyticsPage from './pages/AnalyticsPage'
-import RequestsPage from './pages/RequestsPage'
+import LeaderboardPage from './pages/LeaderboardPage'
+import SupervisorsPage from './pages/SupervisorsPage'
 import PlaceholderPage from './pages/PlaceholderPage'
 import { RouterProvider, useRouter, matchRoute } from './router'
 
@@ -20,10 +21,11 @@ function RouteSwitch() {
     case 'events': return <EventsPage />
     case 'club': return <ClubDetailPage id={route.params.id} />
     case 'analytics': return <AnalyticsPage />
-    case 'requests': return <RequestsPage />
-    case 'budget': return <PlaceholderPage title="الميزانية" description="إدارة وتوزيع الميزانية على الأندية" />
+    case 'leaderboard': return <LeaderboardPage />
+    case 'supervisors': return <SupervisorsPage />
     case 'reports': return <PlaceholderPage title="التقارير" description="تقارير دورية وملخصات تنفيذية" />
     case 'settings': return <PlaceholderPage title="الإعدادات" description="إعدادات المنصة والمستخدمين" />
+    case 'help': return <PlaceholderPage title="الدعم والمساعدة" description="مركز المساعدة والأسئلة الشائعة" />
     default: return <DashboardPage />
   }
 }
