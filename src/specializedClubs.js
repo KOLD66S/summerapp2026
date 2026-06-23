@@ -104,7 +104,8 @@ function buildClub(raw) {
   const theme = themeFor(raw.college)
   const name = `نادي ${raw.college} - ${raw.section}`
 
-  const events = (raw.events || []).map((e, idx) => {
+  const rawEvents = Array.isArray(raw.events) ? raw.events : (raw.events ? [raw.events] : [])
+  const events = rawEvents.map((e, idx) => {
     const points = computeEventPoints(e.eventType, e.catLabel)
     const isoDate = normalizeDate(e.date)
     const dateObj = isoDate ? new Date(isoDate) : null
