@@ -49,9 +49,14 @@ export function matchRoute(path) {
   const clubMatch = path.match(/^\/club\/(.+)$/)
   if (clubMatch) return { name: 'club', params: { id: clubMatch[1] } }
 
+  // /specialized/:id
+  const specMatch = path.match(/^\/specialized\/(.+)$/)
+  if (specMatch) return { name: 'specializedDetail', params: { id: decodeURIComponent(specMatch[1]) } }
+
   switch (path) {
     case '/': return { name: 'dashboard' }
     case '/clubs': return { name: 'clubs' }
+    case '/specialized': return { name: 'specialized' }
     case '/events': return { name: 'events' }
     case '/analytics': return { name: 'analytics' }
     case '/leaderboard': return { name: 'leaderboard' }

@@ -2,14 +2,16 @@ import React from 'react'
 import {
   LayoutDashboard, Users, CalendarDays, BarChart3,
   Trophy, UserCheck, FileBarChart, Settings,
-  HelpCircle, LogOut, Sparkles, Camera
+  HelpCircle, LogOut, Sparkles, Camera, GraduationCap
 } from 'lucide-react'
 import { useRouter, Link, matchRoute } from '../router'
 import { summary, programName, supervisor } from '../thamar'
+import { specializedSummary } from '../specializedClubs'
 
 const mainNav = [
   { icon: LayoutDashboard, label: 'لوحة التحكم', to: '/', name: 'dashboard' },
   { icon: Users, label: 'الأندية', to: '/clubs', name: 'clubs', badge: String(summary.totalClubs), badgeStyle: 'thamar' },
+  { icon: GraduationCap, label: 'الأندية التخصصية', to: '/specialized', name: 'specialized', badge: String(specializedSummary.totalClubs), badgeStyle: 'gold' },
   { icon: CalendarDays, label: 'الأنشطة', to: '/events', name: 'events', badge: String(summary.totalActivities) },
   { icon: BarChart3, label: 'التحليلات', to: '/analytics', name: 'analytics' },
   { icon: Trophy, label: 'لوحة المتميزين', to: '/leaderboard', name: 'leaderboard', badgeStyle: 'gold', badge: '★' },

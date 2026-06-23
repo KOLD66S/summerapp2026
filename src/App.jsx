@@ -3,6 +3,8 @@ import Sidebar from './components/Sidebar'
 import Topbar from './components/Topbar'
 import DashboardPage from './pages/DashboardPage'
 import ClubsPage from './pages/ClubsPage'
+import SpecializedClubsPage from './pages/SpecializedClubsPage'
+import SpecializedClubDetailPage from './pages/SpecializedClubDetailPage'
 import EventsPage from './pages/EventsPage'
 import ClubDetailPage from './pages/ClubDetailPage'
 import AnalyticsPage from './pages/AnalyticsPage'
@@ -18,6 +20,8 @@ function RouteSwitch() {
   switch (route.name) {
     case 'dashboard': return <DashboardPage />
     case 'clubs': return <ClubsPage />
+    case 'specialized': return <SpecializedClubsPage />
+    case 'specializedDetail': return <SpecializedClubDetailPage id={route.params.id} />
     case 'events': return <EventsPage />
     case 'club': return <ClubDetailPage id={route.params.id} />
     case 'analytics': return <AnalyticsPage />
